@@ -55,7 +55,7 @@ io.on('connection', function(socket) {
 });
 
 setInterval(function() {
-    io.emit("init", pixels);
+    io.emit("init", {colors: colors, pixels: pixels});
     io.emit("users", io.engine.clientsCount);
 }, cfg["init_interval"]);
 
