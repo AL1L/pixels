@@ -59,7 +59,7 @@ body,html{margin: 0; background: #000;} #can{touch-action: manipulation; user-se
 }
 
 ::-webkit-scrollbar {
-  width: 10px; 
+  width: 10px;
   height: 10px;
 }
 
@@ -68,7 +68,7 @@ body,html{margin: 0; background: #000;} #can{touch-action: manipulation; user-se
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #fff; 
+  background: #fff;
 }
 
 ::-webkit-scrollbar-corner {
@@ -123,7 +123,7 @@ var DIMS;
 var pixels = []
 
 function mark(x, y, c) {
-    ctx.fillStyle = colors[c];
+    ctx.fillStyle = c;
     ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
 }
 
@@ -135,7 +135,9 @@ function draw(pixels) {
     }
 }
 
-io.on("init", function(px) {
+io.on("init", function(data) {
+    const px = data.pixels;
+    colors = data.colors;
     console.log("INIT");
     DIMS = [px[0].length, px.length]
     pixels = px

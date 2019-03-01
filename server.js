@@ -33,10 +33,10 @@ app.use(express.static(__dirname + '/./client'));
 
 io.on('connection', function(socket) {
     console.log("[CONNECTION] Online: " + io.engine.clientsCount)
-    socket.emit('init', pixels);
+    socket.emit('init', {colors: colors, pixels: pixels});
     socket.emit("users", io.engine.clientsCount);
     socket.on('set', function(p) {
-        if (ratelimits[socket.id] && ((new Date()).getTime() - ratelimits[socket.id]) >= cfg["ratelimit"]) {
+        if (!ratelimits[socket.id] || (ratelimits[socket.id] && ((new Date()).getTime() - ratelimits[socket.id]) >= cfg["ratelimit"])) {
             ratelimits[socket.id] = (new Date()).getTime();
             try {
                 if (p.y < DIM[1] && p.x < DIM[0] && p.y>=0 && p.x >= 0 && Number.isInteger(p.c) && p.c >=0 && p.c < colors.length) {
@@ -44,22 +44,7 @@ io.on('connection', function(socket) {
                     io.emit('set', {
                         x: p.x,
                         y: p.y,
-                        c: p.c
-                    });
-                }
-            }
-            catch (e) {
-            }
-        }
-        else if (!ratelimits[socket.id]) {
-            ratelimits[socket.id] = (new Date()).getTime();
-            try {
-                if (p.y < DIM[1] && p.x < DIM[0] && p.y>=0 && p.x >= 0 && Number.isInteger(p.c) && p.c >=0 && p.c < colors.length) {
-                    pixels[p.y][p.x] = p.c
-                    io.emit('set', {
-                        x: p.x,
-                        y: p.y,
-                        c: p.c
+                        c: colors[p.c]
                     });
                 }
             }
