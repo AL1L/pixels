@@ -1,157 +1,196 @@
-<canvas id="can"></canvas>
+<html >
+<head>
+    <link rel="stylesheet" href="https://pro.fontawesome.com/releases/v5.5.0/css/all.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-96826687-5"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
 
+      gtag('config', 'UA-96826687-5');
+    </script>
+    <title>AL1L Draw</title>
+    <style>
+    @import url('https://fonts.googleapis.com/css?family=Roboto|Roboto+Mono');
 
-
-<form id="colorpicker">
- <input class="colorbutton" type="radio" name="c" value="0" checked>
- <input class="colorbutton" type="radio" name="c" value="1">
- <input class="colorbutton" type="radio" name="c" value="2">
- <input class="colorbutton" type="radio" name="c" value="3">
- <input class="colorbutton" type="radio" name="c" value="4">
- <input class="colorbutton" type="radio" name="c" value="5">
- <input class="colorbutton" type="radio" name="c" value="6">
- <input class="colorbutton" type="radio" name="c" value="7"><br>
- <input class="colorbutton" type="radio" name="c" value="8">
- <input class="colorbutton" type="radio" name="c" value="9">
- <input class="colorbutton" type="radio" name="c" value="10">
- <input class="colorbutton" type="radio" name="c" value="11">
- <input class="colorbutton" type="radio" name="c" value="12">
- <input class="colorbutton" type="radio" name="c" value="13">
- <input class="colorbutton" type="radio" name="c" value="14">
- <input class="colorbutton" type="radio" name="c" value="15">
-</form>
-
-
-<style>
-body,html{margin: 0; background: #000;} #can{touch-action: manipulation; user-select: none;}
-.colorbutton {
-     -webkit-appearance: none;
-     -moz-appearance: none;
-     appearance: none;
-     display: inline-block;
-     top: 10px;
-     height: 30px;
-     width: 30px;
-     border: 0;
-     cursor: pointer;
-     margin-right: 7px;
-     outline: none;
-     border-radius: 0px;
-     border: solid 0px;
-     margin: 1px;
-     border: solid #555 3px;
-     user-select: none;
-}
-
-.colorbutton:hover {
-     border: solid #8888ff 3px;
-}
-.colorbutton:checked {
-    border: solid #8888ff 3px;
-}
-
-#colorpicker {
-  position: fixed;
-  display: inline;
-  top: 7px;
-  left: 7px;
-  user-select: none;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: #333;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #fff;
-}
-
-::-webkit-scrollbar-corner {
-  background: #333;
-}
-
-</style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.slim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.slim.js"></script>
-<script>
-var colors = ["#000000", "#FFFFFF", "#880000", "#AAFFEE", "#CC44CC", "#00CC55", "#0000AA", "#EEEE77", "#DD8855", "#664400", "#FF7777", "#333333", "#777777", "#AAFF66", "#0088FF", "#BBBBBB"];
-
-
-$(".colorbutton").each(function (index) {$(this).css('background-color', colors[index])})
-
-var io = io();
-
-function getTouchPos(c, e) {
-    var rct = c.getBoundingClientRect();
-    return {
-        x: e.touches[0].clientX - rct.left,
-        y: e.touches[0].clientY - rct.top
+    * {
+    font-family: 'Roboto Mono', monospace;
     }
-}
 
-function getMousePos(c, e) {
-    var rct = c.getBoundingClientRect();
-    return {
-        x: e.clientX - rct.left,
-        y: e.clientY - rct.top
+    ::-webkit-scrollbar {
+        display: none;
     }
-}
 
-
-$("#can").bind('click', function(e) {
-    var p = getMousePos(canvas, e);
-    var p = {
-        x: Math.floor(p.x / SCALE),
-        y: Math.floor(p.y / SCALE),
-        c: parseInt(document.querySelector('input[name="c"]:checked').value)
+    html {
+        overflow: -moz-scrollbars-none;
     }
-    io.emit("set", p)
 
-})
-
-var canvas = document.getElementById("can")
-
-
-var ctx = canvas.getContext('2d');
-var SCALE = 10;
-var DIMS;
-var pixels = []
-
-function mark(x, y, c) {
-    ctx.fillStyle = c;
-    ctx.fillRect(x * SCALE, y * SCALE, SCALE, SCALE);
-}
-
-function draw(pixels) {
-    for (var y = 0; y < pixels.length; y++) {
-        for (var x = 0; x < pixels[y].length; x++) {
-            mark(x, y, pixels[y][x]);
-        }
+    body {
+      margin: 0;
+      background: #23272A;
+      margin-bottom: 3vw;
     }
-}
 
-io.on("init", function(data) {
-    const px = data.pixels;
-    colors = data.colors;
-    console.log("INIT");
-    DIMS = [px[0].length, px.length]
-    pixels = px
-    canvas.width = SCALE * DIMS[0];
-    canvas.height = SCALE * DIMS[1];
-    draw(px);
-});
+    #can {
+        touch-action: manipulation;
+        border-bottom: 10px solid transparent;
+        border-right: 10px solid transparent;
+        cursor: crosshair;
+        cursor: url('/Crosshair.cur'), crosshair;
+        margin-bottom: calc(20px + 1em);
+    }
 
-io.on("users", function(users) {
-    window.document.title = users + " Clients Online"
-});
+    .status {
+        position: fixed;
+        display: flex;
+        padding: 10px;
+        bottom: 0;
+        left: 0;
+        width: calc(100% - 20px);
+        justify-content: space-between;
+        color: #7289DA;
+        font-size: 1.3vw;
+        z-index: 10;
+        background: #23272A;
+        user-select: none;
+    }
 
-io.on("set", function(p) {
-    pixels[p.y][p.x] = p.c
-    mark(p.x, p.y, pixels[p.y][p.x])
-});
-</script>
+    a {
+        color: #ffffff;
+    }
+
+    .overlay {
+        position: fixed;
+        z-index: 9;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0,0,0,0.5);
+        user-select: none;
+        color: #7289DA;
+    }
+
+    .overlay .boi {
+        font-size: 1.3vw;
+    }
+
+    .overlay h1, .overlay h2, .overlay ul, .overlay p {
+        margin: 0;
+        text-align: left;
+    }
+
+    .close {
+        text-align: right;
+        cursor: pointer;
+        position: absolute;
+        font-size: 1.5em;
+    }
+
+    .modal {
+        cursor: pointer;
+        text-align: right;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .container {
+        position: absolute;
+        height: calc(100% - 3vw);
+        width: 100%;
+    }
+
+    .colorbutton {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        display: inline-block;
+        top: 10px;
+        height: 30px;
+        width: 30px;
+        border: 0;
+        cursor: pointer;
+        margin-right: 7px;
+        outline: none;
+        border-radius: 0px;
+        border: solid 0px;
+        margin: 1px;
+        border: solid #555 3px;
+        user-select: none;
+    }
+
+    .colorbutton:hover {
+        border: solid #8888ff 3px;
+    }
+    .colorbutton:checked {
+        border: solid #8888ff 3px;
+    }
+
+    #colorpicker {
+        margin: 0;
+    display: inline;
+    user-select: none;
+    }
+    </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
+</head>
+<body>
+    <div class="container">
+        <canvas id="can"></canvas>
+    </div>
+    <div class="overlay boi" id="overlay"><p><i class="fas fa-spin fa-spinner-third"></i> <span id="overlay-status">Connecting...</span></p></div>
+    <div class="overlay" id="motd">
+        <div class="modal" onclick="motd.classList.add('hidden')">
+            <a class="close"><i class="fas fa-times"></i></a>
+            <h1>Welcome!</h1>
+            <h2>Contols:</h2>
+            <h2>
+                <ul>
+                    <li>Left Click: Set a pixel</li>
+                    <li>Ctrl + S: Save the canvas</li>
+                    <li>Alt + Left Click & Drag: Pan the canvas</li>
+                    <li>Middle Click & Drag: Pan the canvas</li>
+                    <li>Scroll: Zoom</li>
+                </ul>
+            </h2>
+        </div>
+    </div>
+    <div class="status">
+        <span class="txt" id="info"><i class="fas fa-spin fa-spinner-third"></i> Loading...</span>
+        <a class="txt hidden" href="#" download="draw_al1l_com.png" id="dl">Save Canvas</a>
+        <form id="colorpicker">
+            <input class="colorbutton" type="radio" name="c" value="0" checked>
+            <input class="colorbutton" type="radio" name="c" value="1">
+            <input class="colorbutton" type="radio" name="c" value="2">
+            <input class="colorbutton" type="radio" name="c" value="3">
+            <input class="colorbutton" type="radio" name="c" value="4">
+            <input class="colorbutton" type="radio" name="c" value="5">
+            <input class="colorbutton" type="radio" name="c" value="6">
+            <input class="colorbutton" type="radio" name="c" value="7">
+            <input class="colorbutton" type="radio" name="c" value="8">
+            <input class="colorbutton" type="radio" name="c" value="9">
+            <input class="colorbutton" type="radio" name="c" value="10">
+            <input class="colorbutton" type="radio" name="c" value="11">
+            <input class="colorbutton" type="radio" name="c" value="12">
+            <input class="colorbutton" type="radio" name="c" value="13">
+            <input class="colorbutton" type="radio" name="c" value="14">
+            <input class="colorbutton" type="radio" name="c" value="15">
+        </form>
+        <span class="txt">Forked From <a href="https://github.com/qwertyquerty/pixels" target="_blank">qwerty</a>.</span>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+    <script src="images.js"></script>
+    <script src="main.js"></script>
+</body>
+</html>
