@@ -297,7 +297,7 @@
 
             $('#colorpicker').replaceWith(form)
             $('input[name="c"]').on('change', () => {
-                this.canvas.selectedColor = document.querySelector('input[name="c"]:checked').value;
+                this.canvas.selectedColor = parseInt(document.querySelector('input[name="c"]:checked').value);
             })
         }
 
