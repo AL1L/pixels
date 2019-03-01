@@ -41,7 +41,7 @@
             this.mouse = [-1,-1];
             this.scale = 10;
             this.colors = [];
-            this.selectedColor = 2;
+            this.selectedColor = 1;
         }
 
         updateMousePos(evt) {
