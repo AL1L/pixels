@@ -124,8 +124,8 @@
             this.io = io({
                 transports: ['websocket']
               });
-            this.roomName = window.location.hash.substr(1) || "global";
-            this.joinRoom(this.roomName);
+            this.roomName = null;
+            this.joinRoom(window.location.hash.substr(1) || "global");
 
             this.io.on("connect", (d) => this.onConnect(d));
             this.io.on("disconnect", (d) => this.onDisconnect(d));
@@ -259,6 +259,10 @@
                 this.canvas.render();
                 return false;
             });
+
+            $(window).on('hashchange', () => {
+                this.joinRoom(window.location.hash.substr(1) || "global");
+            });
         }
 
         joinRoom(name) {
@@ -266,12 +270,25 @@
                 this.room.disconnect();
             }
 
+            if (this.roomName && name === this.roomName) {
+                return;
+            }
+
+            this.setOverlay("Joining room " + name);
+
             this.room = io('/room-' + encodeURIComponent(name));
 
             this.room.on("room", (d) => this.onInit(d));
             this.room.on("set", (d) => this.onSet(d));
 
+            this.roomName = name;
+            if (name === 'global') {
+                window.location.hash = '';
+            } else {
+                window.location.hash = '#' + name;
+            }
             console.log(`[Client] Joined room: ` + name);
+            // this.setOverlay("Geting pixels...");
         }
 
         login(username, password) {
@@ -301,7 +318,7 @@
 
         onConnect(d) {
             console.log(`[Client] Connected`);
-            this.setOverlay("Geting pixels...");
+            // this.setOverlay("Geting pixels...");
         }
 
         onDisconnect() {
