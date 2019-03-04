@@ -247,12 +247,12 @@
                 }
 
                 if(e.originalEvent.deltaY <= 0) {
-                    siht.canvas.scale = Math.min(siht.canvas.scale + 1, 20);
+                    this.canvas.scale = Math.min(siht.canvas.scale + 1, 20);
                 } else {
-                    siht.canvas.scale = Math.max(siht.canvas.scale - 1, 1);
+                    this.canvas.scale = Math.max(siht.canvas.scale - 1, 1);
                 }
                 console.log(`[Client] Zoom Level: ${siht.canvas.scale}`);
-                siht.canvas.render();
+                this.canvas.render();
                 return false;
             });
         }

@@ -61,6 +61,17 @@ class App {
         room.saveFile();
       }
     }, this.config.save_interval)
+
+    setInterval(() => {
+      for(let clientId of Object.keys(this.clients)) {
+        const client = this.clients[clientId];
+
+        if(!client.room)
+          return;
+
+        client.sendRoom();
+      }
+    }, this.config.init_interval)
   }
 
   loadConfig() {
