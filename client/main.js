@@ -25,6 +25,8 @@
             };
 
             client.io.emit("set", p);
+            client.canvas.setPixel(p.x, p.y, p.c)
+            client.canvas.renderPixel(p.x,p.y, p.c);
         }
     }
 
@@ -242,6 +244,8 @@
             });
 
             $(document).on('wheel', (e) => {
+                if(!e.ctrlKey)
+                    return;
                 if(e.originalEvent.deltaY === 0) {
                     return true;
                 }
