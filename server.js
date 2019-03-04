@@ -1,3 +1,20 @@
+const express = require('express');
+const app = express();
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const fs = require('fs');
+
+let config, users, pixels;
+
+function load_config() {
+    config = JSON.parse(fs.readFileSync("config.json", "utf8"));
+    users = JSON.parse(fs.readFileSync("users.json", "utf8"));
+}
+
+load_config();
+
+var ratelimits = {};
+
 function dimensional_array(dimensions,default_value) {
     var array = [];
     for (var i = 0; i < dimensions[0]; ++i) {
@@ -6,42 +23,35 @@ function dimensional_array(dimensions,default_value) {
     return array;
 }
 
-var cfg = require('./config.json');
-
-var DIM = cfg["dim"];
-var pixels;
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var fs = require('fs');
-
-var colors = cfg["colors"];
-
-var ratelimits = {};
-
 try {
-    pixels = JSON.parse(fs.readFileSync(cfg["pixels_path"], "utf8"));
+    pixels = JSON.parse(fs.readFileSync(config["pixels_path"], "utf8"));
 } catch (e) {
-    pixels = dimensional_array([DIM[1], DIM[0]], cfg["default_color"]);
+    pixels = dimensional_array([config.dim[1], config.dim[0]], config["default_color"]);
 }
 
 app.use(express.static(__dirname + '/./client'));
 
-
 io.on('connection', socket => {
-    console.log("[CONNECTION] Online: " + io.engine.clientsCount)
-    socket.emit('init', {colors: colors, pixels: pixels});
+    console.log("[CONNECTION] Online: " + io.engine.clientsCount);
+    socket.emit('init', {colors: config.colors, pixels: pixels});
     socket.emit("users", io.engine.clientsCount);
+    socket.on('login', details => {
+        if (details.username.toLowerCase() in users) {
+            if (details.password === users[details.username.toLowerCase()]) {
+                socket.user = details.username;
+                socket.emit('auth', true);
+            }
+        }
+    });
     socket.on('set', p => {
-        if (ratelimits[socket.id] && ((new Date()).getTime() - ratelimits[socket.id]) < cfg["ratelimit"]) {
+        if (ratelimits[socket.id] && ((new Date()).getTime() - ratelimits[socket.id]) < config["ratelimit"]) {
             return;
         }
 
         ratelimits[socket.id] = (new Date()).getTime();
 
         try {
-            if (p.y < DIM[1] && p.x < DIM[0] && p.y>=0 && p.x >= 0 && Number.isInteger(p.c) && p.c >=0 && p.c < colors.length) {
+            if (p.y < config.dim[1] && p.x < config.dim[0] && p.y>=0 && p.x >= 0 && Number.isInteger(p.c) && p.c >=0 && p.c < colors.length) {
                 pixels[p.y][p.x] = p.c
                 io.emit('set', {
                     x: p.x,
@@ -55,21 +65,21 @@ io.on('connection', socket => {
 });
 
 setInterval(() => {
-    io.emit("init", {colors: colors, pixels: pixels});
+    io.emit("init", {colors: config.colors, pixels: pixels});
     io.emit("users", io.engine.clientsCount);
-}, cfg["init_interval"]);
+}, config["init_interval"]);
 
 setInterval(() => {
     fs.writeFile(
-        cfg["pixels_path"],
+        config["pixels_path"],
         JSON.stringify(pixels),
         err => {
             if (err) {}
         }
     );
-}, cfg["save_interval"]);
+}, config["save_interval"]);
 
 
-http.listen(cfg["port"], cfg["host"], function() {
-    console.log('[DEBUG] Listening on ' + cfg["host"] + ':' + cfg["port"]);
+http.listen(config["port"], config["host"], function() {
+    console.log('[DEBUG] Listening on ' + config["host"] + ':' + config["port"]);
 });

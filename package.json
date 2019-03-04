@@ -1,6 +1,6 @@
 {
   "name": "pixels",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A pixel canvas anyone can draw on",
   "main": "server.js",
   "dependencies": {
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qwertyquerty/pixels.git"
+    "url": "git+https://github.com/AL1L/pixels.git"
   },
   "keywords": [
     "Pixel",
@@ -23,10 +23,13 @@
     "reddit",
     "place"
   ],
-  "author": "qwertyquerty",
+  "authors": [
+    "Allen Lantz <allen.m.lantz@gmail.com>",
+    "qwertyquerty"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/qwertyquerty/pixels/issues"
+    "url": "https://github.com/AL1L/pixels/issues"
   },
-  "homepage": "https://github.com/qwertyquerty/pixels#readme"
+  "homepage": "https://github.com/AL1L/pixels#readme"
 }

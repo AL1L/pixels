@@ -119,13 +119,15 @@
             this.mode = new SetMode();
 
             this.canvas = new Canvas(id, this);
-            this.io = io(url);
+            this.io = io({
+                transports: ['websocket']
+              });
+            this.roomName = window.location.hash.substr(1) || "global";
+            this.joinRoom(this.roomName);
 
             this.io.on("connect", (d) => this.onConnect(d));
             this.io.on("disconnect", (d) => this.onDisconnect(d));
-            this.io.on("init", (d) => this.onInit(d));
-            this.io.on("set", (d) => this.onSet(d));
-            this.io.on("users", (d) => this.onUsers(d));
+            this.io.on("stats", (d) => this.onStats(d));
 
             this.canvas.canvas.addEventListener('click', (e) => {
                 if(e.altKey) return;
@@ -136,6 +138,15 @@
                 if (!this.mode) return;
                 this.mode.onLeftClick(this);
             });
+
+            /*
+            this.mouseMoveBefore = [0,0];
+            this.mouseMoveInterval = setInterval(() => {
+                if(this.canvas.mouse[0] !== this.mouseMoveBefore[0] || this.canvas.mouse[1] !== this,this.mouseMoveBefore[1]) {
+                    this.io.emit('cursor', this.canvas.mouse);
+                }
+            }, 500);
+            */
 
             this.canvas.canvas.addEventListener('mousemove', (e) => {
                 const mbX = this.canvas.mouse[0];
@@ -246,6 +257,23 @@
             });
         }
 
+        joinRoom(name) {
+            if (this.room) {
+                this.room.disconnect();
+            }
+
+            this.room = io('/room-' + encodeURIComponent(name));
+
+            this.room.on("room", (d) => this.onInit(d));
+            this.room.on("set", (d) => this.onSet(d));
+
+            console.log(`[Client] Joined room: ` + name);
+        }
+
+        login(username, password) {
+            this.io.emit('login', {username, password});
+        }
+
         emitPixel(x, y, set) {
             x = Math.min(x, this.canvas.dims[0]);
             y = Math.min(y, this.canvas.dims[1]);
@@ -306,7 +334,8 @@
           this.canvas.renderPixel(p.x,p.y, p.c);
         }
 
-        onUsers(users) {
+        onStats(stats) {
+            const users = stats.globalCount;
             if(users != this.clients) {
                 this.clients = users;
                 console.log(`[Client] Users connected: ${this.clients}`);
