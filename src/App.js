@@ -4,6 +4,7 @@ const io = require('socket.io');
 const fs = require('fs');
 const Client = require('./Client').default;
 const Room = require('./Room').default;
+const Cleanup = require('./cleanup').Cleanup;
 
 
 class App {
@@ -50,28 +51,42 @@ class App {
 
     this.app.use(express.static(__dirname + '/../client'));
 
+    this.app.get('/preview/:room', (request, response, next) => {
+      next();
+    });
+
     this.http.listen(this.config["port"], this.config["host"], (() => {
       console.log('[DEBUG] Listening on ' + this.config["host"] + ':' + this.config["port"]);
     }).bind(this));
 
     setInterval(() => {
-      for(let roomName of Object.keys(this.rooms)) {
-        const room = this.rooms[roomName];
-
-        room.saveFile();
-      }
+      this.saveAll();
     }, this.config.save_interval)
 
     setInterval(() => {
-      for(let clientId of Object.keys(this.clients)) {
-        const client = this.clients[clientId];
+      this.sendAll();
+    }, this.config.init_interval);
 
-        if(!client.room)
-          return;
+    Cleanup(this.saveAll);
+  }
 
-        client.sendRoom();
-      }
-    }, this.config.init_interval)
+  sendAll() {
+    for(let clientId of Object.keys(this.clients)) {
+      const client = this.clients[clientId];
+
+      if(!client.room)
+        return;
+
+      client.sendRoom();
+    }
+  }
+
+  saveAll() {
+    for(let roomName of Object.keys(this.rooms)) {
+      const room = this.rooms[roomName];
+
+      room.saveFile();
+    }
   }
 
   loadConfig() {

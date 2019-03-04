@@ -83,8 +83,8 @@ class Room {
   }
 
   saveFile() {
-    if(this.changes)
-      return;
+    // if(this.changes)
+    // return;
     fs.writeFile(this.filePath, JSON.stringify(this.config), () => {});
     this.changes = false;
   }
