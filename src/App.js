@@ -19,6 +19,8 @@ class App {
     });
 
     this.clients = {};
+    this.config = {};
+    this.users = {};
     this.rooms = {}
 
     this.io.of(/room-./i).on("connect", socket => {
@@ -138,6 +140,7 @@ class App {
 
   loadConfig() {
     this.config = JSON.parse(fs.readFileSync("config.json", "utf8"));
+    this.config = JSON.parse(fs.readFileSync("users.json", "utf8"));
   }
 
   newNickname() {

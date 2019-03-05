@@ -10,15 +10,16 @@ class Client {
     this.nickname = this.app.newNickname();
     this.rateLimit;
     this.setup = false;
+    this.user = false;
 
     this.app.sendStats();
 
     this.sendAuth();
 
     this.socket.on('login', details => {
-        if (details.username.toLowerCase() in users) {
-            if (details.password === users[details.username.toLowerCase()]) {
-                socket.user = details.username;
+        if (details.username.toLowerCase() in this.app.users) {
+            if (details.password === this.app.users[details.username.toLowerCase()]) {
+                this.user = details.username;
                 socket.emit('auth', true);
             }
         }
@@ -28,11 +29,13 @@ class Client {
           return;
         if(p.c === this.room.pixels[p.y][p.x])
           return;
-        if (this.rateLimit && ((new Date()).getTime() - this.rateLimit) < this.app.config["ratelimit"]) {
-            return;
-        }
+        if(!this.user) {
+          if (this.rateLimit && ((new Date()).getTime() - this.rateLimit) < this.app.config["ratelimit"]) {
+              return;
+          }
 
-        this.rateLimit = (new Date()).getTime();
+          this.rateLimit = (new Date()).getTime();
+        }
 
         try {
           this.room.setPixel(p.x, p.y, p.c);

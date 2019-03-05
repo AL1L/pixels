@@ -3,3 +3,5 @@ npm-debug.log
 pixels.json
 .vscode/
 rooms/
+users.json
+config.json
