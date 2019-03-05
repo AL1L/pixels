@@ -5,6 +5,9 @@ const fs = require('fs');
 const Client = require('./Client').default;
 const Room = require('./Room').default;
 const Cleanup = require('./cleanup').Cleanup;
+const { createCanvas } = require('canvas');
+const path = require('path');
+const bodyParser = require('body-parser');
 
 
 class App {
@@ -21,14 +24,7 @@ class App {
     this.io.of(/room-./i).on("connect", socket => {
       const name = socket.nsp.name.substring(6);
       const client = this.clients[socket.id.split("#")[1]];
-      let room;
-
-      if (name in this.rooms) {
-        room = this.rooms[name];
-      } else {
-        room = new Room(this, socket.nsp);
-        this.rooms[name] = room;
-      }
+      let room = this.getRoom(name, socket.nsp);
 
       room.addClient(client, socket);
     });
@@ -50,9 +46,46 @@ class App {
     this.loadConfig();
 
     this.app.use(express.static(__dirname + '/../client'));
+    this.app.use(bodyParser.urlencoded({ extended: false }));
 
-    this.app.get('/preview/:room', (request, response, next) => {
-      next();
+    this.app.get('/preview/:room', (req, res) => {
+      let name = req.params.room.substring(0, req.params.room.length - path.extname(req.params.room).length);
+      const type = path.extname(req.params.room).substring(1) || 'png';
+      const room = this.getRoom(name);
+      let scale;
+      try {
+        scale = parseInt(req.query.s) || 3;
+      } catch(e) {
+        scale = 3;
+      }
+
+      const canvas = createCanvas(room.pixels[0].length * scale, room.pixels.length * scale);
+      const ctx = canvas.getContext('2d');
+
+
+      for(let y = 0; y < room.pixels.length; y++) {
+        for(let x = 0; x < room.pixels[y].length; x++) {
+          ctx.fillStyle = room.colors[room.pixels[y][x]];
+          ctx.fillRect(x * scale, y * scale, scale, scale);
+        }
+      }
+
+      let stream;
+
+      switch(type) {
+        case 'png':
+          stream = canvas.createPNGStream();
+          break;
+        case 'jpeg':
+        case 'jpg':
+          stream = canvas.createJPEGStream();
+          break;
+        default:
+          throw "Invalid type";
+      }
+
+      stream.pipe(res);
+
     });
 
     this.http.listen(this.config["port"], this.config["host"], (() => {
@@ -68,6 +101,20 @@ class App {
     }, this.config.init_interval);
 
     Cleanup(this.saveAll);
+  }
+
+  getRoom(name, nsp) {
+    if (name in this.rooms) {
+      return this.rooms[name];
+    }
+
+    if(!nsp)
+      nsp = this.io.of("/room-" + name);
+
+    const room = new Room(this, nsp);
+    this.rooms[name] = room;
+
+    return room;
   }
 
   sendAll() {

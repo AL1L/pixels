@@ -4,8 +4,9 @@
   "description": "A pixel canvas anyone can draw on",
   "main": "server.js",
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "canvas": "^2.3.1",
     "express": "^4.16.4",
-    "pngjs-draw": "0.0.6",
     "socket.io": "^2.1.1"
   },
   "devDependencies": {},
