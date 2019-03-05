@@ -38,7 +38,7 @@ class Client {
         }
 
         try {
-          this.room.setPixel(p.x, p.y, p.c);
+          this.room.setPixel(p.x, p.y, p.c, this.nickname);
         } catch (e) {
           console.error(e);
         }
@@ -57,7 +57,13 @@ class Client {
   }
 
   sendRoom() {
+    const users = [];
+    for(let clientId of Object.keys(this.room.clients)) {
+      const user = this.room.clients[clientId];
+      users.push(user.nickname);
+    }
     this.roomSocket.emit("room", {
+      users: users,
       colors: this.room.colors,
       pixels: this.room.pixels
     });

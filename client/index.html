@@ -136,8 +136,18 @@
 
     #colorpicker {
         margin: 0;
-    display: inline;
-    user-select: none;
+        display: inline;
+        user-select: none;
+    }
+    .hover {
+        position: absolute;
+        z-index: 1000;
+        background-color: orange;
+        color: white;
+        border-radius: 5px;
+        padding: 3px;
+        font-size: 11px;
+        transform: translateY(-1.5em);
     }
     </style>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
@@ -192,5 +202,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
     <script src="images.js"></script>
     <script src="main.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@widgetbot/crate@3" async type="text/javascript">
+    const crate = new Crate({
+            server: '267529399656513538',
+            channel: '267529399656513538',
+            shard: 'https://cl3.widgetbot.io',
+            location: ['top', 'right']
+        })
+    </script>
 </body>
 </html>

@@ -16,7 +16,7 @@ class Room {
     this.loadFile();
   }
 
-  setPixel(x, y, c) {
+  setPixel(x, y, c, w="system") {
     if(!(Number.isInteger(x) && Number.isInteger(y) && Number.isInteger(c)))
       return;
     if(x >= this.config.pixels.length || y >= this.config.pixels[x].length || x < 0 || y < 0)
@@ -30,7 +30,7 @@ class Room {
     this.changes = true;
 
     this.nsp.emit("set", {
-      x, y, c
+      x, y, c, w
     })
   }
 
