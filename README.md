@@ -6,15 +6,19 @@ A pixel canvas anyone can draw on.
 
 ## Setup
 
-- **`git clone https://github.com/qwertyquerty/pixels`**
+```bash
+# Clone the repository.
+$ git clone https://github.com/qwertyquerty/pixels
 
-- **`cd pixels`**
+# Enter created directory.
+$ cd pixels
 
-- **`npm i`**
+# Install dependencies.
+$ npm i
 
-- Edit the values in `config.json` to your liking
-
-- **`npm start`** or **`pm2 start server.js -n pixels`**
+# Edit the values in `config.json` to your liking, then:
+$ npm start or pm2 start server.js -n pixels
+```
 
 ## Config
 
