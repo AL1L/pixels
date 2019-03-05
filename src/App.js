@@ -140,7 +140,7 @@ class App {
 
   loadConfig() {
     this.config = JSON.parse(fs.readFileSync("config.json", "utf8"));
-    this.config = JSON.parse(fs.readFileSync("users.json", "utf8"));
+    this.users = JSON.parse(fs.readFileSync("users.json", "utf8"));
   }
 
   newNickname() {
